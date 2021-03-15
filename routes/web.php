@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChargingStationControl;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('tenants', [ChargingStationControl::class, 'showAllTenants']);
+Route::get('stores', [ChargingStationControl::class, 'showAllStores']);
+Route::get('charging_stations', [ChargingStationControl::class, 'showAllChargingStations']);
+Route::get('check_if_open/{access}/{id}/{time}', [ChargingStationControl::class, 'checkIfOpen']);
+Route::get('check_the_work_schedule/{access}/{id}/{time}', [ChargingStationControl::class, 'checkTheWorkSchedule']);
