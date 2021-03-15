@@ -21,7 +21,7 @@ class ChargingStation extends Model
 
     public static function findInMaintenance($id)
     {
-        $maintenance = DB::table('charging_station_maintenance')->select()->where('charging_station_id', $id)->orderByDesc('created_at')->get();
+        $maintenance = DB::table('charging_station_maintenance')->select()->where('charging_station_id', $id)->orderByDesc('created_at')->first();
 
         return $maintenance;
     }
@@ -29,6 +29,13 @@ class ChargingStation extends Model
     public static function getWorkTimeForStaff($id)
     {
         $charging_station = DB::table('charging_station')->select('tenant_id', 'store_id', 'for_staff_working_day', 'for_staff_working_time_from', 'for_staff_working_time_to')->where('id', $id)->first();
+
+        return $charging_station;
+    }
+
+    public static function getWorkTimeForClient($id)
+    {
+        $charging_station = DB::table('charging_station')->select('tenant_id', 'store_id', 'for_client_working_day', 'for_client_working_time_from', 'for_client_working_time_to')->where('id', $id)->first();
 
         return $charging_station;
     }

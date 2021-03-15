@@ -16,12 +16,13 @@ class CreateChargingStationMaintenance extends Migration
         Schema::create('charging_station_maintenance', function (Blueprint $table) {
             $table->id();
             $table->integer('charging_station_id');
-            $table->string('for_client_working_day');
-            $table->time('for_client_working_time_from');
-            $table->time('for_client_working_time_to');
-            $table->string('for_staff_working_day');
-            $table->time('for_staff_working_time_from');
-            $table->time('for_staff_working_time_to');
+            $table->string('for_client_working_day')->nullable();
+            $table->time('for_client_working_time_from')->nullable();
+            $table->time('for_client_working_time_to')->nullable();
+            $table->string('for_staff_working_day')->nullable();
+            $table->time('for_staff_working_time_from')->nullable();
+            $table->time('for_staff_working_time_to')->nullable();
+            $table->string('comment')->default('maintenance');
             $table->timestamps();
         });
     }

@@ -18,12 +18,12 @@ class CreateChargingStation extends Migration
             $table->string('name');
             $table->integer('tenant_id');
             $table->integer('store_id');
-            $table->string('for_client_working_day');
-            $table->time('for_client_working_time_from');
-            $table->time('for_client_working_time_to');
-            $table->string('for_staff_working_day');
-            $table->time('for_staff_working_time_from');
-            $table->time('for_staff_working_time_to');
+            $table->string('for_client_working_day')->nullable();
+            $table->time('for_client_working_time_from')->nullable();
+            $table->time('for_client_working_time_to')->nullable();
+            $table->string('for_staff_working_day')->nullable();
+            $table->time('for_staff_working_time_from')->nullable();
+            $table->time('for_staff_working_time_to')->nullable();
             $table->timestamps();
         });
     }

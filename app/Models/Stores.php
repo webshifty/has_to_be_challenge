@@ -25,4 +25,11 @@ class Stores extends Model
 
         return $charging_station;
     }
+
+    public static function getWorkTimeForClient($id)
+    {
+        $charging_station = DB::table('store')->select('for_client_working_day', 'for_client_working_time_from', 'for_client_working_time_to')->where('id', $id)->first();
+
+        return $charging_station;
+    }
 }

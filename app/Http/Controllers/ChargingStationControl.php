@@ -35,9 +35,9 @@ class ChargingStationControl extends Controller
     {
         $checkMaintenance = ChargingStation::findInMaintenance($id);
         $requestDayOfWeek = (string)Carbon::parse($time)->dayOfWeek;
-        $requestTime = Carbon::parse($time)->format('H:m:s');
+        $requestTime = Carbon::parse($time)->format('H:i:s');
 
-        if (count($checkMaintenance) == 0) {
+        if (empty($checkMaintenance)) {
 
             if ($access == 'staff') {
                 $workTimeForStaff = ChargingStation::getWorkTimeForStaff($id);
@@ -53,7 +53,7 @@ class ChargingStationControl extends Controller
                             return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
                         } else {
 
-                            if ($requestTime >= $workTimeForStaffTenant->for_staff_working_time_from && $time <= $workTimeForStaffTenant->for_staff_working_time_to) {
+                            if ($requestTime >= $workTimeForStaffTenant->for_staff_working_time_from && $requestTime <= $workTimeForStaffTenant->for_staff_working_time_to) {
                                 return response()->json(['result' => 'open'], 200, ['Content-Type' => 'application/json']);
                             } else {
                                 return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
@@ -66,7 +66,7 @@ class ChargingStationControl extends Controller
                             return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
                         } else {
 
-                            if ($requestTime >= $workTimeForStaffStore->for_staff_working_time_from && $time <= $workTimeForStaffStore->for_staff_working_time_to) {
+                            if ($requestTime >= $workTimeForStaffStore->for_staff_working_time_from && $requestTime <= $workTimeForStaffStore->for_staff_working_time_to) {
                                 return response()->json(['result' => 'open'], 200, ['Content-Type' => 'application/json']);
                             } else {
                                 return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
@@ -80,7 +80,7 @@ class ChargingStationControl extends Controller
                         return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
                     } else {
 
-                        if ($requestTime >= $workTimeForStaff->for_staff_working_time_from && $time <= $workTimeForStaff->for_staff_working_time_to) {
+                        if ($requestTime >= $workTimeForStaff->for_staff_working_time_from && $requestTime <= $workTimeForStaff->for_staff_working_time_to) {
                             return response()->json(['result' => 'open'], 200, ['Content-Type' => 'application/json']);
                         } else {
                             return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
@@ -88,13 +88,68 @@ class ChargingStationControl extends Controller
                     }
                 }
             } elseif ($access == 'client') {
+                $workTimeForClient = ChargingStation::getWorkTimeForClient($id);
 
+                if (is_null($workTimeForClient->for_client_working_day)) {
+                    $workTimeForClientStore = Stores::getWorkTimeForClient($workTimeForClient->store_id);
+
+                    if (is_null($workTimeForClientStore)) {
+                        $workTimeForClientTenant = Tenants::getWorkTimeForClient($workTimeForClient->tenant_id);
+                        $checkWorkingday = strpos($workTimeForClientTenant->for_client_working_day, $requestDayOfWeek);
+
+                        if ($checkWorkingday === false) {
+                            return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
+                        } else {
+
+                            if ($requestTime >= $workTimeForClientTenant->for_client_working_time_from && $requestTime <= $workTimeForClientTenant->for_client_working_time_to) {
+                                return response()->json(['result' => 'open'], 200, ['Content-Type' => 'application/json']);
+                            } else {
+                                return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
+                            }
+                        }
+                    } else {
+                        $checkWorkingday = strpos($workTimeForClientStore->for_client_working_day, $requestDayOfWeek);
+
+                        if ($checkWorkingday === false) {
+                            return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
+                        } else {
+
+                            if ($requestTime >= $workTimeForClientStore->for_client_working_time_from && $requestTime <= $workTimeForClientStore->for_client_working_time_to) {
+                                return response()->json(['result' => 'open'], 200, ['Content-Type' => 'application/json']);
+                            } else {
+                                return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
+                            }
+                        }
+                    }
+                } else {
+                    $checkWorkingday = strpos($workTimeForClient->for_client_working_day, $requestDayOfWeek);
+
+                    if ($checkWorkingday === false) {
+                        return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
+                    } else {
+
+                        if ($requestTime >= $workTimeForClient->for_client_working_time_from && $requestTime <= $workTimeForClient->for_client_working_time_to) {
+                            return response()->json(['result' => 'open'], 200, ['Content-Type' => 'application/json']);
+                        } else {
+                            return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
+                        }
+                    }
+                }
             }
         } else {
+            $checkWorkingday = strpos($checkMaintenance->for_staff_working_day, $requestDayOfWeek);
 
+            if ($checkWorkingday === false) {
+                return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
+            } else {
+
+                if ($requestTime >= $checkMaintenance->for_staff_working_time_from && $time <= $checkMaintenance->for_staff_working_time_to) {
+                    return response()->json(['result' => 'open'], 200, ['Content-Type' => 'application/json']);
+                } else {
+                    return response()->json(['result' => 'close'], 200, ['Content-Type' => 'application/json']);
+                }
+            }
         }
-
-        //return response()->json(['data' => $data], 200, ['Content-Type' => 'application/json']);
     }
 
     public function checkTheWorkSchedule($id, $time)
